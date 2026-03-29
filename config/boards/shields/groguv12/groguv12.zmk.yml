@@ -4,6 +4,6 @@ name: groguv12
 type: shield
 url: https://github.com/aidan/groguv12
 requires:
-  - seeeduino_xiao_ble
+  - xiao_ble
 features:
   - keys
