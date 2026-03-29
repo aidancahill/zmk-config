@@ -138,7 +138,7 @@ static DEVICE_API(gpio, gpio_165_api) = {
     static struct gpio_165_data gpio_165_data_##n;                          \
     static const struct gpio_165_config gpio_165_config_##n = {             \
         .common = {                                                         \
-            .port_pin_mask = GPIO_PORT_PIN_MASK_FROM_DT_INST(n),            \
+            .port_pin_mask = GPIO_PORT_PIN_MASK_FROM_NGPIOS(DT_INST_PROP(n, ngpios)), \
         },                                                                  \
         .spi = SPI_DT_SPEC_INST_GET(n,                                      \
             SPI_OP_MODE_MASTER | SPI_TRANSFER_MSB | SPI_WORD_SET(8), 0),    \
