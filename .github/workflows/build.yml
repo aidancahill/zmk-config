@@ -1,0 +1,49 @@
+name: Build ZMK Firmware
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container:
+      image: zmkfirmware/zmk-build-arm:stable
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Cache west modules
+        uses: actions/cache@v4
+        with:
+          path: |
+            modules/
+            tools/
+            zephyr/
+            bootloader/
+            zmk/
+          key: west-${{ runner.os }}-${{ hashFiles('config/west.yml') }}
+
+      - name: West init
+        run: west init -l config
+
+      - name: West update
+        run: west update
+
+      - name: West zephyr-export
+        run: west zephyr-export
+
+      - name: Build firmware
+        run: |
+          west build -s zmk/app -b seeeduino_xiao_ble -- \
+            -DSHIELD=groguv12 \
+            -DZMK_CONFIG="${GITHUB_WORKSPACE}/config" \
+            -DZMK_EXTRA_MODULES="${GITHUB_WORKSPACE}/zmk-module"
+
+      - name: Upload firmware
+        uses: actions/upload-artifact@v4
+        with:
+          name: groguv12-seeeduino_xiao_ble-zmk
+          path: build/zephyr/zmk.uf2
