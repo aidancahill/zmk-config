@@ -1,0 +1,37 @@
+description: |
+  Keyboard scan matrix using 74HC595 shift registers for columns
+  and GPIO for rows. Uses SPI to drive shift register chain.
+
+compatible: "groguv12,kscan-sr-matrix"
+
+include: [kscan.yaml, spi-device.yaml]
+
+properties:
+  col-count:
+    type: int
+    required: true
+    description: Number of columns
+  row-count:
+    type: int
+    required: true
+    description: Number of rows
+  sr-bytes:
+    type: int
+    required: true
+    description: Number of bytes in shift register chain (3 for 24 bits)
+  latch-gpios:
+    type: phandle-array
+    required: true
+    description: GPIO for shift register latch (RCLK)
+  row-gpios:
+    type: phandle-array
+    required: true
+    description: GPIO pins for matrix rows (active high with pull-down)
+  poll-interval-ms:
+    type: int
+    default: 1
+    description: Polling interval in milliseconds
+  debounce-ms:
+    type: int
+    default: 5
+    description: Debounce time in milliseconds

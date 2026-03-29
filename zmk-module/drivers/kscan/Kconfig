@@ -1,0 +1,8 @@
+config KSCAN_SR_MATRIX
+	bool "Shift register matrix keyboard scan driver"
+	default y
+	depends on SPI && GPIO
+	select KSCAN
+	help
+	  Enable shift register (74HC595) based keyboard matrix scanning.
+	  Uses SPI to drive column shift registers and GPIO to read rows.
