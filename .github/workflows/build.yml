@@ -39,7 +39,8 @@ jobs:
         run: |
           west build -s zmk/app -b xiao_ble//zmk -- \
             -DSHIELD=custom-keyboard \
-            -DZMK_CONFIG="${GITHUB_WORKSPACE}/config"
+            -DZMK_CONFIG="${GITHUB_WORKSPACE}/config" \
+            -DZMK_EXTRA_MODULES="${GITHUB_WORKSPACE}/zmk_module"
 
       - name: Upload firmware
         uses: actions/upload-artifact@v4
