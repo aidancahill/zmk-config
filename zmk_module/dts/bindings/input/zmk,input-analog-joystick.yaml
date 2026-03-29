@@ -1,0 +1,28 @@
+description: |
+  Analog joystick input driver. Reads two ADC channels for X/Y axes
+  and an optional button GPIO. Can operate in mouse or scroll mode.
+
+compatible: "zmk,input-analog-joystick"
+
+properties:
+  io-channels:
+    required: true
+    description: ADC channels for X and Y axes (2 channels required)
+  button-gpios:
+    type: phandle-array
+    description: GPIO for joystick button (active low with pull-up)
+  deadzone:
+    type: int
+    default: 100
+    description: ADC deadzone around center (values below this ignored)
+  poll-interval-ms:
+    type: int
+    default: 10
+    description: Polling interval in milliseconds
+  sensitivity:
+    type: int
+    default: 15
+    description: Movement sensitivity multiplier
+  scroll-mode:
+    type: boolean
+    description: If set, outputs scroll events instead of mouse movement

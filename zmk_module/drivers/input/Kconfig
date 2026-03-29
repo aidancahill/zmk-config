@@ -1,0 +1,7 @@
+config INPUT_ANALOG_JOYSTICK
+	bool "Analog joystick input driver"
+	default y
+	depends on ADC && GPIO
+	help
+	  Enable analog joystick driver that reads ADC channels
+	  for X/Y axes and generates mouse or scroll input events.

@@ -1,2 +1,0 @@
-config SHIELD_GROGUV12
-    def_bool $(shields_list_contains,groguv12)

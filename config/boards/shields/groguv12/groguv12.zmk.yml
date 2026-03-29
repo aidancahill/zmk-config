@@ -1,9 +1,0 @@
-file_format: "2"
-id: groguv12
-name: groguv12
-type: shield
-url: https://github.com/aidan/groguv12
-requires:
-  - xiao_ble
-features:
-  - keys

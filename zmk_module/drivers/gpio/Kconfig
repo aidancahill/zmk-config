@@ -1,0 +1,7 @@
+config GPIO_165
+	bool "74HC165 PISO shift register GPIO input driver"
+	default y
+	depends on SPI && GPIO
+	help
+	  Enable 74HC165 parallel-in serial-out shift register
+	  GPIO input driver for reading matrix rows via SPI.

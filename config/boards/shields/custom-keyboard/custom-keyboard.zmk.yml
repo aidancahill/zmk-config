@@ -1,0 +1,10 @@
+file_format: "2"
+id: custom-keyboard
+name: custom-keyboard
+type: shield
+url: https://github.com/aidan/custom-keyboard
+requires:
+  - xiao_ble
+features:
+  - keys
+  - pointing

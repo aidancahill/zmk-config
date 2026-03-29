@@ -1,6 +1,0 @@
-if SHIELD_GROGUV12
-
-config ZMK_KEYBOARD_NAME
-    default "groguv12"
-
-endif

@@ -1,0 +1,20 @@
+description: |
+  74HC165 parallel-in serial-out shift register GPIO input expander.
+  Uses SPI CS pin (set to GPIO_ACTIVE_HIGH) as the PL (parallel load) control.
+  Between SPI transactions PL is LOW (loading), during reads PL is HIGH (shifting).
+
+compatible: "zmk,gpio-165"
+
+include: [gpio-controller.yaml, spi-device.yaml]
+
+properties:
+  "#gpio-cells":
+    const: 2
+  ngpios:
+    type: int
+    required: true
+    description: Number of GPIO input pins (8, 16, 24, or 32 for daisy-chained)
+
+gpio-cells:
+  - pin
+  - flags

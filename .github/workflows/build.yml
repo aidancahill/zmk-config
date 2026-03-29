@@ -38,11 +38,11 @@ jobs:
       - name: Build firmware
         run: |
           west build -s zmk/app -b xiao_ble//zmk -- \
-            -DSHIELD=groguv12 \
+            -DSHIELD=custom-keyboard \
             -DZMK_CONFIG="${GITHUB_WORKSPACE}/config"
 
       - name: Upload firmware
         uses: actions/upload-artifact@v4
         with:
-          name: groguv12-seeeduino_xiao_ble-zmk
+          name: custom-keyboard-seeeduino_xiao_ble-zmk
           path: build/zephyr/zmk.uf2

@@ -1,0 +1,144 @@
+/*
+ * custom-keyboard shield overlay
+ *
+ * Pin mapping:
+ *   D0  (P0.02/AIN0) = L_Joystick_Vert (ADC)
+ *   D1  (P0.03/AIN1) = L_Joystick_Horz (ADC)
+ *   D2  (P0.28/AIN4) = R_Joystick_Vert (ADC)
+ *   D3  (P0.29/AIN5) = R_Joystick_Horz (ADC)
+ *   D4  (P0.04)      = L_Joystick_Bttn (GPIO)
+ *   D5  (P0.05)      = R_Joystick_Bttn (GPIO)
+ *   D6  (P1.11)      = 74HC165 PL (SPI CS, GPIO_ACTIVE_HIGH)
+ *   D7  (P1.12)      = 74HC595 RCLK (SPI CS, GPIO_ACTIVE_LOW)
+ *   D8  (P1.13)      = SCK (shared SPI clock)
+ *   D9  (P1.14)      = MISO (74HC165 Q7 serial data)
+ *   D10 (P1.15)      = MOSI (74HC595 serial data)
+ */
+
+&pinctrl {
+    spi2_default: spi2_default {
+        group1 {
+            psels = <NRF_PSEL(SPIM_SCK, 1, 13)>,
+                    <NRF_PSEL(SPIM_MOSI, 1, 15)>,
+                    <NRF_PSEL(SPIM_MISO, 1, 14)>;
+        };
+    };
+    spi2_sleep: spi2_sleep {
+        group1 {
+            psels = <NRF_PSEL(SPIM_SCK, 1, 13)>,
+                    <NRF_PSEL(SPIM_MOSI, 1, 15)>,
+                    <NRF_PSEL(SPIM_MISO, 1, 14)>;
+            low-power-enable;
+        };
+    };
+};
+
+&xiao_spi {
+    status = "okay";
+    cs-gpios = <&xiao_d 7 GPIO_ACTIVE_LOW>,
+               <&xiao_d 6 GPIO_ACTIVE_HIGH>;
+
+    shifter: 595@0 {
+        compatible = "zmk,gpio-595";
+        status = "okay";
+        gpio-controller;
+        spi-max-frequency = <200000>;
+        reg = <0>;
+        #gpio-cells = <2>;
+        ngpios = <24>;
+    };
+
+    reader: 165@1 {
+        compatible = "zmk,gpio-165";
+        status = "okay";
+        gpio-controller;
+        spi-max-frequency = <200000>;
+        reg = <1>;
+        #gpio-cells = <2>;
+        ngpios = <8>;
+    };
+};
+
+&adc {
+    status = "okay";
+};
+
+/ {
+    chosen {
+        zmk,kscan = &kscan0;
+        zmk,matrix-transform = &default_transform;
+    };
+
+    default_transform: matrix_transform {
+        compatible = "zmk,matrix-transform";
+        columns = <14>;
+        rows = <5>;
+        map = <
+            0x0200 0x0301 0x0003 0x0004 0x0005 0x0405 0x010d 0x010c 0x000b 0x000a 0x0009 0x0108
+            0x0100 0x0201 0x0302 0x0403 0x0404 0x0305 0x000d 0x000c 0x040a 0x0409 0x0408 0x0008
+            0x0000 0x0101 0x0202 0x0303 0x0304 0x0205 0x0206 0x020d 0x030c 0x030b 0x030a 0x0309 0x0308 0x0207
+            0x0001 0x0102 0x0203 0x0204 0x0105 0x020c 0x020b 0x020a 0x0209 0x0208
+            0x0002 0x0103 0x0104 0x0109 0x010a 0x010b
+        >;
+    };
+
+    kscan0: kscan_0 {
+        compatible = "zmk,kscan-gpio-matrix";
+        wakeup-source;
+        diode-direction = "col2row";
+
+        col-gpios =
+            <&shifter 0  GPIO_ACTIVE_HIGH>
+            , <&shifter 1  GPIO_ACTIVE_HIGH>
+            , <&shifter 2  GPIO_ACTIVE_HIGH>
+            , <&shifter 3  GPIO_ACTIVE_HIGH>
+            , <&shifter 4  GPIO_ACTIVE_HIGH>
+            , <&shifter 5  GPIO_ACTIVE_HIGH>
+            , <&shifter 6  GPIO_ACTIVE_HIGH>
+            , <&shifter 7  GPIO_ACTIVE_HIGH>
+            , <&shifter 8  GPIO_ACTIVE_HIGH>
+            , <&shifter 9  GPIO_ACTIVE_HIGH>
+            , <&shifter 10 GPIO_ACTIVE_HIGH>
+            , <&shifter 11 GPIO_ACTIVE_HIGH>
+            , <&shifter 12 GPIO_ACTIVE_HIGH>
+            , <&shifter 13 GPIO_ACTIVE_HIGH>
+            ;
+
+        row-gpios =
+            <&reader 0 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>
+            , <&reader 1 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>
+            , <&reader 2 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>
+            , <&reader 3 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>
+            , <&reader 4 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>
+            ;
+    };
+
+    right_joystick: right_joystick {
+        compatible = "zmk,input-analog-joystick";
+        io-channels = <&adc 4>, <&adc 5>;
+        button-gpios = <&xiao_d 5 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
+        deadzone = <100>;
+        poll-interval-ms = <10>;
+        sensitivity = <15>;
+    };
+
+    left_joystick: left_joystick {
+        compatible = "zmk,input-analog-joystick";
+        io-channels = <&adc 0>, <&adc 1>;
+        button-gpios = <&xiao_d 4 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
+        deadzone = <100>;
+        poll-interval-ms = <10>;
+        sensitivity = <10>;
+        scroll-mode;
+    };
+
+    mouse_listener: mouse_listener {
+        compatible = "zmk,input-listener";
+        device = <&right_joystick>;
+    };
+
+    scroll_listener: scroll_listener {
+        compatible = "zmk,input-listener";
+        device = <&left_joystick>;
+    };
+};

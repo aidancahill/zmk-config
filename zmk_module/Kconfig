@@ -1,0 +1,2 @@
+rsource "drivers/gpio/Kconfig"
+rsource "drivers/input/Kconfig"
