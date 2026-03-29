@@ -146,7 +146,7 @@ static DEVICE_API(gpio, gpio_165_api) = {
     };                                                                      \
     DEVICE_DT_INST_DEFINE(n, gpio_165_init, NULL,                           \
                           &gpio_165_data_##n, &gpio_165_config_##n,         \
-                          POST_KERNEL, CONFIG_GPIO_INIT_PRIORITY,           \
+                          POST_KERNEL, 41,                                  \
                           &gpio_165_api);
 
 DT_INST_FOREACH_STATUS_OKAY(GPIO_165_INIT)
