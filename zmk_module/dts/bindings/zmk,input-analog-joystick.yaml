@@ -7,6 +7,7 @@ compatible: "zmk,input-analog-joystick"
 properties:
   io-channels:
     required: true
+    type: phandle-array
     description: ADC channels for X and Y axes (2 channels required)
   button-gpios:
     type: phandle-array
