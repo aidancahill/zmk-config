@@ -1,5 +1,0 @@
-build:
-  cmake: .
-  kconfig: drivers/kscan/Kconfig
-  settings:
-    dts_root: .

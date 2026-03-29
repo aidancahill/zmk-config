@@ -1,65 +1,82 @@
-/*
- * groguv12 shield overlay for Seeeduino XIAO BLE
- *
- * Pin mapping:
- *   D0  (P0.02) = Row 1
- *   D1  (P0.03) = Row 2
- *   D2  (P0.28) = Row 3
- *   D3  (P0.29) = Row 4
- *   D4  (P0.04) = Row 5
- *   D7  (P1.12) = RCLK (latch)
- *   D8  (P1.13) = SCK  (SPI clock)
- *   D10 (P1.15) = MOSI (SPI data)
- */
+#include <dt-bindings/zmk/matrix_transform.h>
 
-&spi2 {
+&xiao_spi {
     status = "okay";
-    compatible = "nordic,nrf-spim";
-    pinctrl-0 = <&spi2_default>;
-    pinctrl-1 = <&spi2_sleep>;
-    pinctrl-names = "default", "sleep";
-    cs-gpios = <&gpio1 12 GPIO_ACTIVE_LOW>;  /* D7/P1.12 as CS (we use it as latch) */
+    cs-gpios = <&xiao_d 7 GPIO_ACTIVE_LOW>;
 
-    kscan: kscan@0 {
-        compatible = "groguv12,kscan-sr-matrix";
+    shifter: 595@0 {
+        compatible = "zmk,gpio-595";
+        status = "okay";
+        gpio-controller;
+        spi-max-frequency = <200000>;
         reg = <0>;
-        spi-max-frequency = <4000000>;
-
-        col-count = <14>;
-        row-count = <5>;
-        sr-bytes = <3>;
-        poll-interval-ms = <1>;
-        debounce-ms = <5>;
-
-        latch-gpios = <&gpio1 12 GPIO_ACTIVE_HIGH>;  /* D7 / P1.12 */
-
-        row-gpios =
-            <&gpio0 2  (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>,  /* D0 / P0.02 = Row 1 */
-            <&gpio0 3  (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>,  /* D1 / P0.03 = Row 2 */
-            <&gpio0 28 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>,  /* D2 / P0.28 = Row 3 */
-            <&gpio0 29 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>,  /* D3 / P0.29 = Row 4 */
-            <&gpio0 4  (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>;  /* D4 / P0.04 = Row 5 */
-    };
-};
-
-&pinctrl {
-    spi2_default: spi2_default {
-        group1 {
-            psels = <NRF_PSEL(SPIM_SCK, 1, 13)>,   /* D8 / P1.13 */
-                    <NRF_PSEL(SPIM_MOSI, 1, 15)>;   /* D10 / P1.15 */
-        };
-    };
-    spi2_sleep: spi2_sleep {
-        group1 {
-            psels = <NRF_PSEL(SPIM_SCK, 1, 13)>,
-                    <NRF_PSEL(SPIM_MOSI, 1, 15)>;
-            low-power-enable;
-        };
+        #gpio-cells = <2>;
+        ngpios = <24>;
     };
 };
 
 / {
     chosen {
-        zmk,kscan = &kscan;
+        zmk,kscan = &kscan0;
+        zmk,matrix-transform = &default_transform;
+    };
+
+    default_transform: matrix_transform {
+        compatible = "zmk,matrix-transform";
+        columns = <14>;
+        rows = <5>;
+        map = 
+            RC(2,0) RC(3,1) RC(0,3) RC(0,4) RC(0,5) RC(4,5)           RC(1,13) RC(1,12) RC(0,11) RC(0,10) RC(0,9) RC(1,8)
+            RC(1,0) RC(2,1) RC(3,2) RC(4,3) RC(4,4) RC(3,5)           RC(0,13) RC(0,12) RC(4,10) RC(4,9)  RC(4,8) RC(0,8)
+            RC(0,0) RC(1,1) RC(2,2) RC(3,3) RC(3,4) RC(2,5) RC(2,6)   RC(2,13) RC(3,12) RC(3,11) RC(3,10) RC(3,9) RC(3,8) RC(2,7)
+                    RC(0,1) RC(1,2) RC(2,3) RC(2,4) RC(1,5)           RC(2,12) RC(2,11) RC(2,10) RC(2,9)  RC(2,8)
+                            RC(0,2) RC(1,3) RC(1,4)                    RC(1,9)  RC(1,10) RC(1,11)
+        >;
+    };
+
+    kscan0: kscan_0 {
+        compatible = "zmk,kscan-gpio-matrix";
+        wakeup-source;
+        diode-direction = "col2row";
+
+        col-gpios =
+            <&shifter 0  GPIO_ACTIVE_HIGH>,
+            <&shifter 1  GPIO_ACTIVE_HIGH>,
+            <&shifter 2  GPIO_ACTIVE_HIGH>,
+            <&shifter 3  GPIO_ACTIVE_HIGH>,
+            <&shifter 4  GPIO_ACTIVE_HIGH>,
+            <&shifter 5  GPIO_ACTIVE_HIGH>,
+            <&shifter 6  GPIO_ACTIVE_HIGH>,
+            <&shifter 7  GPIO_ACTIVE_HIGH>,
+            <&shifter 8  GPIO_ACTIVE_HIGH>,
+            <&shifter 9  GPIO_ACTIVE_HIGH>,
+            <&shifter 10 GPIO_ACTIVE_HIGH>,
+            <&shifter 11 GPIO_ACTIVE_HIGH>,
+            <&shifter 12 GPIO_ACTIVE_HIGH>,
+            <&shifter 13 GPIO_ACTIVE_HIGH>;
+
+        row-gpios =
+            <&xiao_d 0 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>,
+            <&xiao_d 1 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>,
+            <&xiao_d 2 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>,
+            <&xiao_d 3 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>,
+            <&xiao_d 4 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>;
     };
 };
+```
+
+**2. Replace `config/boards/shields/groguv12/Kconfig.defconfig` with:**
+```
+if SHIELD_GROGUV12
+
+config ZMK_KEYBOARD_NAME
+    default "groguv12"
+
+endif
+```
+
+**3. Update `config/groguv12.conf` to:**
+```
+CONFIG_ZMK_USB=y
+CONFIG_ZMK_BLE=n
+CONFIG_SPI=y

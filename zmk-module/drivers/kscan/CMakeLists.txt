@@ -1,2 +1,0 @@
-zephyr_library()
-zephyr_library_sources_ifdef(CONFIG_KSCAN_SR_MATRIX kscan_sr_matrix.c)
