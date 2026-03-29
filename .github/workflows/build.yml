@@ -37,7 +37,7 @@ jobs:
 
       - name: Build firmware
         run: |
-          west build -s zmk/app -b seeeduino_xiao_ble -- \
+          west build -s zmk/app -b xiao_ble//zmk -- \
             -DSHIELD=groguv12 \
             -DZMK_CONFIG="${GITHUB_WORKSPACE}/config" \
             -DZMK_EXTRA_MODULES="${GITHUB_WORKSPACE}/zmk-module"
